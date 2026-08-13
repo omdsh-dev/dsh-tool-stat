@@ -1,5 +1,7 @@
 # dsh-tool-stat
 
+[English](README.en.md)
+
 DSH 统计工具插件 —— 描述统计、百分位数、频数分布、相关性计算。零依赖、纯函数、确定性。
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
