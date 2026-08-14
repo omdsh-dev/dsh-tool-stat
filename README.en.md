@@ -80,29 +80,39 @@ node <monorepo>/node_modules/typescript/bin/tsc -p tsconfig.json
 node <monorepo>/node_modules/vitest/vitest.mjs run tests
 ```
 
-## npm rc.1 Compatibility (Verified)
+## npm 0.1.0-rc.6 Compatibility (Verified)
 
-This plugin has been migrated to the npm rc.1 dependency line and fully verified end-to-end in an isolated consumer of `@deepseek-ai/dsh@0.0.1-rc.1`:
+This plugin has been migrated to the npm 0.1.0-rc.6 dependency line and fully verified end-to-end in an isolated consumer of `@deepseek-ai/dsh@0.1.0-rc.6` (npm private package):
 
-- **Types/runtime**: `@deepseek-ai/cordis@^4.0.1-rc.1` + `@deepseek-ai/dsh-tools@^0.0.1-rc.1` + `@deepseek-ai/dsh-invariants@^0.0.1-rc.1` (peer); no longer depends on the unscoped `cordis`
+- **Types/runtime**: peers are `@deepseek-ai/cordis: ^4.0.1` + `@deepseek-ai/dsh-tools: >=0.0.1-rc.1 <0.2.0` + `@deepseek-ai/dsh-invariants: >=0.0.1-rc.1 <0.2.0`; no longer depends on the unscoped `cordis`
 - **Standalone build**: `npm install` (devDependencies are self-contained: typescript/vitest/@types/node) → `npm run typecheck` → `npm test` → `npm run build` → `npm pack`
-- **Consumption verification**: tarball installed into an rc.1 consumer → `dsh --profile compat --dump-config` shows this plugin's row → tool registration and execution actually pass
-- **Launch method**: `npx -p @deepseek-ai/dsh@0.0.1-rc.1 dsh web` (lib production mode; do not `install -g` globally)
+- **Consumption verification**: tarball installed into a DSH 0.1.0-rc.6 (npm) consumer → `dsh --profile compat --dump-config` shows this plugin's row → tool registration and execution actually pass
+- **Launch method**: `npx -p @deepseek-ai/dsh@0.1.0-rc.6 dsh web` (lib production mode; do not `install -g` globally)
 
 ## Installation
 
 ### Profile Bundle (Recommended)
 
-Install this plugin into a profile as a standalone bundle (0806+):
+Install this plugin into a profile as a standalone bundle (DSH 0.1.0-rc.6 (npm)). This repository lives under the [omdsh-dev](https://github.com/omdsh-dev) organization and is publicly accessible:
 
 ```sh
-# Interactive (web) profile
-dsh plugin --profile web add "C:/path/to/dsh-tool-stat"
+# Interactive (web) profile —— install from the GitHub repository
+dsh plugin --profile web add github:omdsh-dev/dsh-tool-stat
 # One-off task (headless) profile —— dsh run uses headless by default
-dsh plugin --profile headless add "C:/path/to/dsh-tool-stat"
+dsh plugin --profile headless add github:omdsh-dev/dsh-tool-stat
 ```
 
-The bundled `dsh.bundle.patch` automatically adds the plugin to the profile's layer stack after installation (row id: `tool-stat`). The plugin's missing peer dependencies (`cordis`, `@deepseek-ai/dsh-tools`) are provided by the profile's healed `profiles/node_modules` fallback installation.
+Or install from the tarball produced by `npm pack`:
+
+```sh
+npm pack     # produces dsh-tool-stat-<version>.tgz
+# Interactive (web) profile
+dsh plugin --profile web add ./dsh-tool-stat-<version>.tgz
+# One-off task (headless) profile
+dsh plugin --profile headless add ./dsh-tool-stat-<version>.tgz
+```
+
+The bundled `dsh.bundle.patch` automatically adds the plugin to the profile's layer stack after installation (row id: `tool-stat`). The plugin's missing peer dependencies (`@deepseek-ai/cordis`, `@deepseek-ai/dsh-tools`, `@deepseek-ai/dsh-invariants`) are provided by the profile's healed `profiles/node_modules` fallback installation.
 
 > ⚠️ web and headless are **different profiles**: installing into web does not automatically cover headless; `dsh run` uses the headless profile by default. Use forward slashes for Windows paths (`C:/...`).
 
@@ -118,9 +128,9 @@ dsh --profile web --dump-config | grep tool-stat
 dsh run "使用 stat 工具计算 [1,2,3,4,5] 的描述统计"
 ```
 
-### Manual Installation and Legacy Compatibility
+### Manual Installation and Legacy Compatibility (legacy monorepo scenario)
 
-Only for old snapshots that do not support Profile Bundle, or for plugin development/debugging environments (local junction/symlink, manually editing profile layers).
+The monorepo way is only for legacy scenarios: old snapshots that do not support Profile Bundle, or plugin development/debugging environments (local junction/symlink, manually editing profile layers).
 
 ## License
 
